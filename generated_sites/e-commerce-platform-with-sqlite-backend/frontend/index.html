@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexCart - Premium E-Commerce Hub</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              300: '#7cc8fc',
+              400: '#36adf7',
+              500: '#0c92e9',
+              600: '#0274c4',
+              700: '#035ca0',
+              800: '#074f84',
+              900: '#0c426e',
+              950: '#082a49',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- TOP MARQUEE / STATUS BANNER -->
+  <div id="api-status-banner" class="bg-brand-950 text-white text-xs py-1.5 px-4 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="status-dot"></span>
+        <span id="status-text" class="font-medium tracking-wide">Connecting to API Server...</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-4 text-brand-200">
+        <span><i class="fa-solid fa-truck-fast mr-1"></i> Free shipping on orders over $100</span>
+        <span class="text-brand-400">|</span>
+        <span id="mode-badge" class="bg-brand-800 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Loading</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+        
+        <!-- Logo -->
+        <a href="#/" class="flex items-center gap-2.5 shrink-0 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-all">
+            <i class="fa-solid fa-bag-shopping text-lg"></i>
+          </div>
+          <div>
+            <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent">ApexCart</span>
+            <span class="block text-[10px] font-semibold text-slate-400 tracking-widest uppercase -mt-1">E-Commerce</span>
+          </div>
+        </a>
+
+        <!-- Desktop Search bar -->
+        <div class="hidden md:flex flex-1 max-w-md mx-4">
+          <form id="global-search-form" class="w-full relative">
+            <input 
+              type="text" 
+              id="global-search-input"
+              placeholder="Search products, brands, categories..." 
+              class="w-full pl-10 pr-4 py-2 rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
+            >
+            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </div>
+            <button type="submit" class="hidden">Search</button>
+          </form>
+        </div>
+
+        <!-- Navigation Actions -->
+        <nav class="flex items-center gap-1.5 sm:gap-3">
+          <!-- Catalog Link -->
+          <a href="#/catalog" class="nav-link px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-50 transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-compass text-slate-400 group-hover:text-brand-500"></i>
+            <span class="hidden sm:inline">Browse</span>
+          </a>
+
+          <!-- Cart Icon -->
+          <a href="#/cart" class="relative px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-50 transition-all flex items-center gap-1.5">
+            <div class="relative">
+              <i class="fa-solid fa-cart-shopping text-lg text-slate-600 hover:text-brand-600"></i>
+              <span id="cart-badge" class="absolute -top-2.5 -right-2.5 bg-rose-500 text-white text-[10px] font-extrabold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 border-2 border-white shadow-sm transition-all transform scale-100">0</span>
+            </div>
+            <span class="hidden lg:inline ml-1">Cart</span>
+          </a>
+
+          <!-- Order History (Hidden when logged out, but responsive) -->
+          <a href="#/orders" id="nav-orders" class="hidden px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-50 transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-receipt text-slate-400"></i>
+            <span class="hidden sm:inline">Orders</span>
+          </a>
+
+          <div class="h-6 w-px bg-slate-200 mx-1 sm:mx-2"></div>
+
+          <!-- Auth Buttons Container -->
+          <div id="nav-auth" class="flex items-center gap-2">
+            <!-- Loading state -->
+            <div class="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+
+        </nav>
+      </div>
+
+      <!-- Mobile Search bar -->
+      <div class="md:hidden pb-4 px-1">
+        <form id="mobile-search-form" class="relative">
+          <input 
+            type="text" 
+            id="mobile-search-input"
+            placeholder="Search products, brands, categories..." 
+            class="w-full pl-10 pr-4 py-2 rounded-full border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
+          >
+          <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- NOTIFICATION CONTAINER (TOASTS) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-md w-full px-4 sm:px-0 pointer-events-none"></div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main id="app-viewport" class="flex-grow transition-opacity duration-200">
+    <!-- Pages will load dynamically here -->
+    <div class="flex items-center justify-center min-h-[60vh]">
+      <div class="text-center">
+        <div class="inline-block w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-slate-500 font-medium">Initializing ApexCart Workspace...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 pt-16 pb-8 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div class="md:col-span-1">
+          <div class="flex items-center gap-2.5 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <span class="text-lg font-extrabold text-white tracking-tight">ApexCart</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed mb-4">
+            The next generation high-performance digital commerce experience. Fully responsive, highly optimized, and robustly synchronized with a powerful SQLite database system.
+          </p>
+          <div class="flex gap-3">
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-brand-500 hover:text-white transition-all"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-brand-500 hover:text-white transition-all"><i class="fa-brands fa-twitter text-sm"></i></a>
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-brand-500 hover:text-white transition-all"><i class="fa-brands fa-instagram text-sm"></i></a>
+            <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-300 hover:bg-brand-500 hover:text-white transition-all"><i class="fa-brands fa-github text-sm"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Departments</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#/catalog?category=Electronics" class="hover:text-white transition-colors">Electronics</a></li>
+            <li><a href="#/catalog?category=Footwear" class="hover:text-white transition-colors">Footwear</a></li>
+            <li><a href="#/catalog?category=Apparel" class="hover:text-white transition-colors">Apparel</a></li>
+            <li><a href="#/catalog?category=Accessories" class="hover:text-white transition-colors">Accessories</a></li>
+            <li><a href="#/catalog?category=Furniture" class="hover:text-white transition-colors">Furniture</a></li>
+            <li><a href="#/catalog?category=Groceries" class="hover:text-white transition-colors">Groceries</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Customer Care</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#/cart" class="hover:text-white transition-colors">Shopping Cart</a></li>
+            <li><a href="#/orders" class="hover:text-white transition-colors">Track Orders</a></li>
+            <li><a href="#/login" class="hover:text-white transition-colors">Account Login</a></li>
+            <li><a href="#/register" class="hover:text-white transition-colors">Create Account</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Shipping & Returns</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Support Center</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Core Integration</h4>
+          <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+            Connected to the transactional SQLite relational catalog. Experience authentic state updates, stock reductions, and dynamic order receipt generations.
+          </p>
+          <div id="sync-indicator" class="inline-flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/50 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-slate-300 font-medium">Synced with Local SQLite Gateway</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+        <p>&copy; 2025 ApexCart Inc. All rights reserved. Built with precision styling and resilient fallback architecture.</p>
+        <div class="flex gap-4">
+          <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+          <span>&middot;</span>
+          <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+          <span>&middot;</span>
+          <a href="#" class="hover:text-white transition-colors">Security Audit</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Script -->
+  <script src="script.js"></script>
+</body>
+</html>

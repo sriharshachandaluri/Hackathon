@@ -1,0 +1,372 @@
+{
+  "project": "TaskFlow - Collaborative Project Management Platform",
+  "purpose": "A modern, highly-interactive collaborative project and task management system designed to help teams plan, track, and execute work efficiently. It features dynamic Kanban boards, task assignments, real-time-like status updates, comments, and productivity analytics.",
+  "frontend": {
+    "pages": [
+      {
+        "name": "Landing & Authentication",
+        "route": "/login",
+        "description": "Clean, modern welcome screen with login, registration, and password reset capability."
+      },
+      {
+        "name": "Dashboard Overview",
+        "route": "/dashboard",
+        "description": "High-level summary of active projects, upcoming deadlines, recent activities, and key productivity metrics represented via charts."
+      },
+      {
+        "name": "Project Workspace (Kanban)",
+        "route": "/projects/:id",
+        "description": "A comprehensive kanban board view of a specific project. Users can drag-and-drop tasks across columns (To Do, In Progress, Review, Done), filter by priority/assignee, and create new tasks."
+      },
+      {
+        "name": "Project Directory",
+        "route": "/projects",
+        "description": "Grid/List view of all accessible projects with completion bars, member avatars, and creation forms."
+      },
+      {
+        "name": "Team Directory",
+        "route": "/teams",
+        "description": "Management page for team members, user roles (Admin, Member, Viewer), and invitations."
+      },
+      {
+        "name": "Analytics & Reports",
+        "route": "/analytics",
+        "description": "Visual insights displaying task completion rates, workload distribution per user, and sprint burn-down simulation charts."
+      }
+    ],
+    "features": [
+      "Interactive drag-and-drop Kanban card transitions",
+      "Instant task search and multi-tag filtering (by Priority, Tag, Assignee)",
+      "Dark mode and accessibility-focused responsive user interface",
+      "Interactive inline editing for task details (titles, descriptions, dates)",
+      "Real-time UI state synchronization using client-side state managers"
+    ]
+  },
+  "backend": {
+    "apis": [
+      {
+        "method": "POST",
+        "path": "/api/auth/register",
+        "request": {
+          "email": "user@example.com",
+          "password": "SecurePassword123!",
+          "firstName": "John",
+          "lastName": "Doe"
+        },
+        "response": {
+          "status": "success",
+          "token": "eyJhbGciOi...",
+          "user": {
+            "id": "u-101",
+            "email": "user@example.com",
+            "role": "Member"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "request": {
+          "email": "user@example.com",
+          "password": "SecurePassword123!"
+        },
+        "response": {
+          "status": "success",
+          "token": "eyJhbGciOi...",
+          "user": {
+            "id": "u-101",
+            "email": "user@example.com",
+            "role": "Member"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/projects",
+        "request": {},
+        "response": {
+          "projects": [
+            {
+              "id": "p-201",
+              "name": "Website Redesign",
+              "description": "Overhaul of corporate website.",
+              "status": "active",
+              "createdAt": "2023-10-01T12:00:00Z"
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/projects",
+        "request": {
+          "name": "Mobile Application",
+          "description": "Develop iOS and Android apps."
+        },
+        "response": {
+          "project": {
+            "id": "p-202",
+            "name": "Mobile Application",
+            "description": "Develop iOS and Android apps.",
+            "status": "active",
+            "createdAt": "2023-10-25T14:30:00Z"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/projects/:projectId/tasks",
+        "request": {},
+        "response": {
+          "tasks": [
+            {
+              "id": "t-301",
+              "title": "Design Database Schema",
+              "description": "Outline tables and relationships.",
+              "status": "In Progress",
+              "priority": "High",
+              "dueDate": "2023-11-05",
+              "assigneeId": "u-101"
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/projects/:projectId/tasks",
+        "request": {
+          "title": "Setup CI/CD Pipeline",
+          "description": "Automate deployments to staging environment.",
+          "status": "To Do",
+          "priority": "Medium",
+          "dueDate": "2023-11-12",
+          "assigneeId": "u-102"
+        },
+        "response": {
+          "task": {
+            "id": "t-302",
+            "title": "Setup CI/CD Pipeline",
+            "description": "Automate deployments to staging environment.",
+            "status": "To Do",
+            "priority": "Medium",
+            "dueDate": "2023-11-12",
+            "assigneeId": "u-102",
+            "createdAt": "2023-10-25T15:00:00Z"
+          }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/tasks/:taskId",
+        "request": {
+          "status": "Done",
+          "priority": "High"
+        },
+        "response": {
+          "task": {
+            "id": "t-301",
+            "title": "Design Database Schema",
+            "status": "Done",
+            "priority": "High",
+            "updatedAt": "2023-10-25T16:20:00Z"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/tasks/:taskId/comments",
+        "request": {
+          "content": "Schema is approved and ready to implement."
+        },
+        "response": {
+          "comment": {
+            "id": "c-401",
+            "taskId": "t-301",
+            "userId": "u-101",
+            "content": "Schema is approved and ready to implement.",
+            "createdAt": "2023-10-25T16:21:00Z"
+          }
+        }
+      }
+    ]
+  },
+  "database": {
+    "tables": [
+      {
+        "name": "users",
+        "columns": [
+          {
+            "name": "id",
+            "type": "VARCHAR(50)",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "email",
+            "type": "VARCHAR(255)",
+            "constraints": "UNIQUE NOT NULL"
+          },
+          {
+            "name": "password_hash",
+            "type": "VARCHAR(255)",
+            "constraints": "NOT NULL"
+          },
+          {
+            "name": "first_name",
+            "type": "VARCHAR(100)",
+            "constraints": ""
+          },
+          {
+            "name": "last_name",
+            "type": "VARCHAR(100)",
+            "constraints": ""
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "constraints": "DEFAULT CURRENT_TIMESTAMP"
+          }
+        ]
+      },
+      {
+        "name": "projects",
+        "columns": [
+          {
+            "name": "id",
+            "type": "VARCHAR(50)",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "name",
+            "type": "VARCHAR(255)",
+            "constraints": "NOT NULL"
+          },
+          {
+            "name": "description",
+            "type": "TEXT",
+            "constraints": ""
+          },
+          {
+            "name": "owner_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES users(id)"
+          },
+          {
+            "name": "status",
+            "type": "VARCHAR(50)",
+            "constraints": "DEFAULT 'active'"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "constraints": "DEFAULT CURRENT_TIMESTAMP"
+          }
+        ]
+      },
+      {
+        "name": "tasks",
+        "columns": [
+          {
+            "name": "id",
+            "type": "VARCHAR(50)",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "project_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES projects(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "title",
+            "type": "VARCHAR(255)",
+            "constraints": "NOT NULL"
+          },
+          {
+            "name": "description",
+            "type": "TEXT",
+            "constraints": ""
+          },
+          {
+            "name": "status",
+            "type": "VARCHAR(50)",
+            "constraints": "DEFAULT 'To Do'"
+          },
+          {
+            "name": "priority",
+            "type": "VARCHAR(50)",
+            "constraints": "DEFAULT 'Medium'"
+          },
+          {
+            "name": "due_date",
+            "type": "DATE",
+            "constraints": ""
+          },
+          {
+            "name": "assignee_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES users(id) ON DELETE SET NULL"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "constraints": "DEFAULT CURRENT_TIMESTAMP"
+          }
+        ]
+      },
+      {
+        "name": "comments",
+        "columns": [
+          {
+            "name": "id",
+            "type": "VARCHAR(50)",
+            "constraints": "PRIMARY KEY"
+          },
+          {
+            "name": "task_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES tasks(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "user_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES users(id)"
+          },
+          {
+            "name": "content",
+            "type": "TEXT",
+            "constraints": "NOT NULL"
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP",
+            "constraints": "DEFAULT CURRENT_TIMESTAMP"
+          }
+        ]
+      },
+      {
+        "name": "project_members",
+        "columns": [
+          {
+            "name": "project_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES projects(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "user_id",
+            "type": "VARCHAR(50)",
+            "constraints": "FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "role",
+            "type": "VARCHAR(50)",
+            "constraints": "DEFAULT 'Member'"
+          },
+          {
+            "name": "PRIMARY KEY",
+            "type": "(project_id, user_id)",
+            "constraints": ""
+          }
+        ]
+      }
+    ]
+  }
+}
