@@ -1,9 +1,9 @@
-from website_generator.agents.manager_agent.agent import manager_agent, parallel_development
+from website_generator.agents.manager_agent.agent import manager_agent, development_agents
 
 
-def test_parallel_development_contains_three_independent_agents():
-    assert parallel_development.name == "parallel_development"
-    assert {agent.name for agent in parallel_development.sub_agents} == {
+def test_sequential_development_contains_three_independent_agents():
+    assert development_agents.name == "development_agents_sequential"
+    assert {agent.name for agent in development_agents.sub_agents} == {
         "frontend_agent", "backend_agent", "database_agent"
     }
 

@@ -1,6 +1,6 @@
 # AI Website Generator
 
-A small multi-agent website generator built with Google ADK. The manager analyzes a request into a shared project specification, then ADK's `ParallelAgent` starts the frontend, backend, and database agents concurrently. Integration and testing run after the parallel fan-out completes; deployment preparation is gated on a passing test report.
+A small multi-agent website generator built with Google ADK. The manager analyzes a request into a shared project specification, then runs the frontend, backend, and database agents sequentially to limit bursts against the model API. Integration and testing follow; deployment preparation is gated on a passing test report.
 
 ## Setup
 
@@ -20,11 +20,16 @@ Set `GOOGLE_API_KEY` in `.env`. Never commit credentials. Run the ADK developer 
 adk web
 ```
 
+The configured Gemini model makes one attempt per call so quota errors surface
+promptly instead of triggering more requests. Development agents run one at a
+time to reduce request bursts. If Google reports that the model quota is
+exhausted, wait for it to reset or request higher limits in Google AI Studio.
+
 Select `website_generator` and describe the site you want. Generated projects are written under `generated_sites/<project-slug>/`.
 
 ## Workflow
 
-`Manager Agent` first writes `project_spec.json`. `Parallel Development` is an ADK `ParallelAgent` with exactly three children (Frontend, Backend, Database); each reads the same spec and writes to its own directory. ADK waits for all parallel children before `Integration Agent` runs. `Testing Agent` records a structured PASS/FAIL report. `Deployment Agent` only prepares a Docker/Cloud Run deployment bundle when the report is PASS; it does not deploy or claim a live URL without explicit cloud credentials and an actual deployment.
+`Manager Agent` first writes `project_spec.json`. The development stage runs three agents sequentially (Frontend, Backend, Database); each reads the same spec and writes to its own directory. `Integration Agent` then checks the combined output. `Testing Agent` records a structured PASS/FAIL report. `Deployment Agent` only prepares a Docker/Cloud Run deployment bundle when the report is PASS; it does not deploy or claim a live URL without explicit cloud credentials and an actual deployment.
 
 Each worker's output is stored under a unique session state key. The integration and testing stages check generated artifacts and cross-component contracts. The project includes deployment preparation, but actual Cloud Run deployment requires a configured Google Cloud project and authenticated `gcloud` environment.
 
