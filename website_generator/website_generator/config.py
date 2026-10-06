@@ -14,3 +14,5 @@ MODEL = Gemini(
         http_status_codes=[429, 500, 503, 504],
     ),
 )
+
+MAX_REPAIR_ITERATIONS = max(1, int(os.getenv("MAX_REPAIR_ITERATIONS", "3")))
