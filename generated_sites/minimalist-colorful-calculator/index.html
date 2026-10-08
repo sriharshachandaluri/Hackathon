@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Colorful Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-shape circle"></div>
+    <div class="bg-shape square"></div>
+    <div class="bg-shape triangle"></div>
+
+    <div class="calculator" data-feature-ids="FEATURE_001, FEATURE_002, FEATURE_003">
+        <div id="display" class="display">0</div>
+        <div class="buttons">
+            <button onclick="handleButtonClick('7')" data-feature-ids="FEATURE_001">7</button>
+            <button onclick="handleButtonClick('8')" data-feature-ids="FEATURE_001">8</button>
+            <button onclick="handleButtonClick('9')" data-feature-ids="FEATURE_001">9</button>
+            <button class="operator" onclick="handleButtonClick('/')" data-feature-ids="FEATURE_001">/</button>
+            
+            <button onclick="handleButtonClick('4')" data-feature-ids="FEATURE_001">4</button>
+            <button onclick="handleButtonClick('5')" data-feature-ids="FEATURE_001">5</button>
+            <button onclick="handleButtonClick('6')" data-feature-ids="FEATURE_001">6</button>
+            <button class="operator" onclick="handleButtonClick('*')" data-feature-ids="FEATURE_001">*</button>
+            
+            <button onclick="handleButtonClick('1')" data-feature-ids="FEATURE_001">1</button>
+            <button onclick="handleButtonClick('2')" data-feature-ids="FEATURE_001">2</button>
+            <button onclick="handleButtonClick('3')" data-feature-ids="FEATURE_001">3</button>
+            <button class="operator" onclick="handleButtonClick('-')" data-feature-ids="FEATURE_001">-</button>
+            
+            <button onclick="handleButtonClick('0')" data-feature-ids="FEATURE_001">0</button>
+            <button onclick="handleButtonClick('C')" data-feature-ids="FEATURE_001" class="clear">C</button>
+            <button onclick="calculateResult()" data-feature-ids="FEATURE_001" class="equals">=</button>
+            <button class="operator" onclick="handleButtonClick('+')" data-feature-ids="FEATURE_001">+</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

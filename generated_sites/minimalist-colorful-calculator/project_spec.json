@@ -1,0 +1,241 @@
+{
+  "project_name": "Minimalist Colorful Calculator",
+  "purpose": "A simple calculator with a minimalist UI, bright colors, and geometric background shapes.",
+  "PROJECT_SCOPE": "A client-side calculator app that performs basic arithmetic (addition, subtraction, multiplication, division) using HTML, CSS, and Vanilla JS.",
+  "APPROVED_FEATURES": [
+    {
+      "id": "FEATURE_001",
+      "name": "Arithmetic Operations",
+      "purpose": "Perform basic math calculations.",
+      "user_actions": [
+        "Click number buttons",
+        "Click operator buttons",
+        "Click equals",
+        "Click clear"
+      ],
+      "expected_behavior": "Display numbers and calculate results based on standard order of operations logic handled by JS eval/logic.",
+      "required": true,
+      "frontend_scope": [
+        "display area",
+        "number buttons (0-9)",
+        "operator buttons (+, -, *, /)",
+        "equals button",
+        "clear button"
+      ],
+      "client_logic_scope": [
+        "handleButtonClick",
+        "calculateResult",
+        "updateDisplay"
+      ],
+      "data_scope": [],
+      "validation": "Prevent division by zero, prevent invalid operator sequences.",
+      "error_handling": "Display 'Error' on division by zero or malformed input.",
+      "dependencies": [],
+      "data_flow": "Input -> Event Listener -> Calculation Logic -> Display Update",
+      "clarification_status": "none"
+    },
+    {
+      "id": "FEATURE_002",
+      "name": "Minimalist UI with Bright Colors",
+      "purpose": "Provide a visually distinct aesthetic.",
+      "user_actions": [],
+      "expected_behavior": "Bright color palette applied via CSS.",
+      "required": true,
+      "frontend_scope": [
+        "CSS layout"
+      ],
+      "client_logic_scope": [],
+      "data_scope": [],
+      "validation": "None",
+      "error_handling": "None",
+      "dependencies": [],
+      "data_flow": "None",
+      "clarification_status": "none"
+    },
+    {
+      "id": "FEATURE_003",
+      "name": "Geometric Background",
+      "purpose": "Visual decoration.",
+      "user_actions": [],
+      "expected_behavior": "Static background with simple CSS shapes.",
+      "required": true,
+      "frontend_scope": [
+        "CSS background shapes"
+      ],
+      "client_logic_scope": [],
+      "data_scope": [],
+      "validation": "None",
+      "error_handling": "None",
+      "dependencies": [],
+      "data_flow": "None",
+      "clarification_status": "none"
+    }
+  ],
+  "OUT_OF_SCOPE_FUNCTIONALITY": [
+    "Scientific calculator features",
+    "History log",
+    "Keyboard support",
+    "Dark/Light mode toggle",
+    "Backend data storage",
+    "Framework usage (React, Vue, etc.)"
+  ],
+  "FRONTEND_SPECIFICATION": {
+    "pages": [
+      {
+        "name": "index.html",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ],
+        "purpose": "Main calculator interface",
+        "trigger": "Page load",
+        "inputs": [
+          "Button clicks"
+        ],
+        "outputs": [
+          "Display screen update"
+        ],
+        "state": [
+          "currentInput"
+        ],
+        "UI behavior": "Buttons respond to click, result appears in display",
+        "validation": "None",
+        "loading/error/success states": "Error shown on division by zero",
+        "navigation": "None",
+        "data consumed": "None"
+      }
+    ]
+  },
+  "DATA_SPECIFICATION": {
+    "files": [
+      {
+        "path": "data/data.json",
+        "purpose": "Initial or read-only application data",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ]
+      }
+    ],
+    "root_structure": {},
+    "collections": [],
+    "initial_data": {},
+    "operations": [],
+    "persistence": {
+      "strategy": "READ_ONLY_JSON"
+    }
+  },
+  "DATA_FLOW_SPECIFICATION": {
+    "FEATURE_001": {
+      "user_action": "Button click",
+      "UI_event_handler": "handleButtonClick",
+      "client_logic": "append digit or apply operator",
+      "localStorage": "none",
+      "rendered_UI": "Update result field"
+    }
+  },
+  "CLIENT_LOGIC_SPECIFICATION": {
+    "functions": [
+      {
+        "name": "handleButtonClick",
+        "feature_ids": [
+          "FEATURE_001"
+        ],
+        "trigger": "onclick",
+        "inputs": [
+          "value"
+        ],
+        "outputs": [
+          "none"
+        ],
+        "effects": [
+          "Update display text content"
+        ]
+      },
+      {
+        "name": "calculateResult",
+        "feature_ids": [
+          "FEATURE_001"
+        ],
+        "trigger": "onclick",
+        "inputs": [
+          "currentExpression"
+        ],
+        "outputs": [
+          "result"
+        ],
+        "effects": [
+          "Update display with result"
+        ]
+      }
+    ]
+  },
+  "FILE_SPECIFICATION": {
+    "files": [
+      {
+        "path": "index.html",
+        "purpose": "Main structure",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ]
+      },
+      {
+        "path": "style.css",
+        "purpose": "Layout, bright colors, and geometric shapes",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ]
+      },
+      {
+        "path": "script.js",
+        "purpose": "Calculation logic",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ]
+      },
+      {
+        "path": "data/data.json",
+        "purpose": "Initial or read-only application data",
+        "feature_ids": [
+          "FEATURE_001",
+          "FEATURE_002",
+          "FEATURE_003"
+        ]
+      }
+    ]
+  },
+  "TRACEABILITY_MATRIX": {
+    "FEATURE_001": [
+      "index.html",
+      "script.js"
+    ],
+    "FEATURE_002": [
+      "style.css"
+    ],
+    "FEATURE_003": [
+      "style.css"
+    ]
+  },
+  "SCOPE_AUDIT": {
+    "traceability_check": "Pass",
+    "inferred_feature_exclusion": "Pass",
+    "persistence_correctness": "Pass",
+    "no_backend_check": "Pass"
+  },
+  "FRONTEND_AGENT_PROMPT": "Implement a calculator app using only index.html, style.css, and script.js. The calculator must perform basic arithmetic (+, -, *, /) and include a clear button. Feature IDs: FEATURE_001, FEATURE_002, FEATURE_003. Use a minimalist UI with bright colors and CSS-based geometric shapes in the background. Use vanilla JS for logic. Handle division by zero. SCOPE ENFORCEMENT: The Orchestrator specification is authoritative. Implement exactly and only the listed functionality. Do not invent, infer, add convenience/standard/future features, unrequested CRUD, extra fields, pages, navigation, UI, validation, or data operations. Every element, function, event handler, operation, field, page, and file must trace to an approved feature ID. Use only HTML, CSS, vanilla JavaScript, JSON seed data when specified, and localStorage when specified. Never implement a backend, API call, SQL/database, framework, or server-side code. Never pretend JavaScript can write data.json. If a dependency appears necessary but is unspecified, do not implement it: report UNAUTHORIZED_DEPENDENCY with what is needed, why, which approved feature requires it, and affected files. Implement the minimum complete system.",
+  "project": "Minimalist Colorful Calculator",
+  "backend": {},
+  "database": {},
+  "frontend": {
+    "pages": [],
+    "features": []
+  }
+}

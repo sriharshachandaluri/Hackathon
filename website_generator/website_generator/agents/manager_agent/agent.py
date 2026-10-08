@@ -1,10 +1,77 @@
+import asyncio
+import json
+import re
+import subprocess
+import sys
+import threading
+from pathlib import Path
+
 from google.adk.agents import Agent, LoopAgent, SequentialAgent
+from google.adk.events import Event
+from google.genai import types
 from ...config import MODEL, MAX_REPAIR_ITERATIONS
 from ..shared import save_spec
 from ..frontend_agent.agent import frontend_agent
 from ..integration_agent.agent import integration_agent
 from ..testing_agent.agent import testing_agent
 from ..runner_agent.agent import runner_agent
+from ...runner import resolve_project
+
+
+_active_runner_processes = []
+
+
+def _start_existing_runner(project_slug):
+    project = resolve_project(project_slug)
+    project_root = Path(__file__).resolve().parents[3]
+    process = subprocess.Popen(
+        [sys.executable, "-m", "website_generator.runner", project_slug],
+        cwd=str(project_root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+    )
+    startup = {"url": None, "error": None}
+    ready = threading.Event()
+
+    def capture_runner_output():
+        try:
+            for line in process.stdout:
+                match = re.search(r"https?://[^\s]+", line)
+                if match and startup["url"] is None:
+                    startup["url"] = match.group(0).rstrip(".,)")
+                    ready.set()
+        except Exception as exc:
+            startup["error"] = str(exc)
+        finally:
+            ready.set()
+
+    reader = threading.Thread(target=capture_runner_output, daemon=True)
+    reader.start()
+    if not ready.wait(timeout=20):
+        process.terminate()
+        raise RuntimeError("The existing runner did not print a URL during startup")
+    if not startup["url"]:
+        detail = startup["error"] or "The runner exited without printing a URL"
+        raise RuntimeError(detail)
+    if process.poll() is not None:
+        raise RuntimeError("The runner printed a URL but exited before serving the application")
+
+    _active_runner_processes.append((process, reader))
+    return startup["url"]
+
+
+def _final_response(manager_name, invocation_id, message):
+    return Event(
+        author=manager_name,
+        invocation_id=invocation_id,
+        content=types.Content(
+            role="model",
+            parts=[types.Part(text=message)],
+        ),
+        turn_complete=True,
+    )
 
 
 intent_classifier_agent = Agent(
@@ -71,13 +138,64 @@ class IntentGatedManagerAgent(SequentialAgent):
                 yield event
             return
 
-        async for event in super()._run_async_impl(ctx):
-            yield event
+        # Keep the existing runner agent registered for compatibility, but do
+        # not invoke its LLM handoff. Start the existing static runner below.
+        for production_stage in self.sub_agents[:2]:
+            async for event in production_stage.run_async(ctx):
+                yield event
+
+        report = ctx.session.state.get("test_report")
+        try:
+            report = json.loads(report) if isinstance(report, str) else report
+        except (TypeError, ValueError):
+            report = None
+
+        try:
+            tests_passed = (
+                isinstance(report, dict)
+                and report.get("status") == "PASS"
+                and int(report.get("failed", 0)) == 0
+            )
+        except (TypeError, ValueError):
+            tests_passed = False
+
+        if not tests_passed:
+            yield _final_response(
+                self.name,
+                ctx.invocation_id,
+                "The generated application was not started because its test report is not PASS.",
+            )
+            return
+
+        project_slug = str(ctx.session.state.get("project_slug", "")).strip()
+        if not project_slug:
+            yield _final_response(
+                self.name,
+                ctx.invocation_id,
+                "The application passed testing, but the runner could not start it because the project slug is missing.",
+            )
+            return
+
+        try:
+            url = await asyncio.to_thread(_start_existing_runner, project_slug)
+        except Exception as exc:
+            yield _final_response(
+                self.name,
+                ctx.invocation_id,
+                f"The application passed testing, but the existing runner did not start successfully: {exc}",
+            )
+            return
+
+        yield _final_response(
+            self.name,
+            ctx.invocation_id,
+            f"Your generated application is running at {url}",
+        )
 
 
 manager_agent = IntentGatedManagerAgent(
     name="manager_agent",
-    description="Define closed client-side scope, generate and validate the frontend, then provide the static runner command only after PASS.",
+    description="Classify intent, generate and validate explicit application requests, then start the tested static application and return its actual local URL.",
     sub_agents=[manager_analysis_agent, integration_testing_loop, runner_agent],
 )
 

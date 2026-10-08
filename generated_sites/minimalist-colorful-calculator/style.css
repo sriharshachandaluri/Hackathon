@@ -1,0 +1,62 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f4f8;
+    font-family: sans-serif;
+    overflow: hidden;
+}
+
+/* FEATURE_003: Geometric Background */
+.bg-shape {
+    position: absolute;
+    opacity: 0.3;
+    z-index: -1;
+}
+.circle { width: 200px; height: 200px; border-radius: 50%; background: #ff5e57; top: 10%; left: 10%; }
+.square { width: 150px; height: 150px; background: #3c40c6; bottom: 15%; right: 10%; }
+.triangle { width: 0; height: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-bottom: 200px solid #0be881; top: 20%; right: 20%; }
+
+/* FEATURE_002: Minimalist UI with Bright Colors */
+.calculator {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+.display {
+    background: #2f3542;
+    color: #fff;
+    padding: 20px;
+    font-size: 2rem;
+    text-align: right;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+button {
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #edeff2;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover { background: #dfe4ea; }
+.operator { background: #ff9f43; color: white; }
+.clear { background: #ff6b6b; color: white; }
+.equals { background: #54a0ff; color: white; grid-column: span 1; }
