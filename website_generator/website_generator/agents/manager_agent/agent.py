@@ -7,6 +7,28 @@ from ..testing_agent.agent import testing_agent
 from ..runner_agent.agent import runner_agent
 
 
+intent_classifier_agent = Agent(
+    name="manager_intent_classifier",
+    model=MODEL,
+    output_key="manager_intent",
+    instruction="""Classify the user's latest message before any application-generation work begins. Return exactly one label and nothing else: CASUAL_CONVERSATION, PRODUCTION_REQUEST, or CLARIFICATION_REQUIRED.
+
+Use PRODUCTION_REQUEST only when the user explicitly asks to create, build, make, or otherwise implement a software application or website. A greeting does not cancel an explicit build request, so 'Hi, create a todo app' is PRODUCTION_REQUEST. Greetings alone, thanks, questions, explanations, and discussion about APIs, LLMs, agents, ADK, programming, or this project are CASUAL_CONVERSATION. Never infer a build request from context or from the assumption that every message asks for an app. If the user expresses a possible creation intent but does not specify a clear application request (for example, 'make something cool'), choose CLARIFICATION_REQUIRED. When uncertain whether an application was explicitly requested, choose CLARIFICATION_REQUIRED.""",
+)
+
+manager_conversation_agent = Agent(
+    name="manager_conversation",
+    model=MODEL,
+    instruction="""Respond normally to the user's conversational message. Answer questions helpfully, explain the project or general concepts when asked, and acknowledge greetings or thanks. Do not create or describe a project specification, invoke application-generation work, or claim that files were created.""",
+)
+
+manager_clarification_agent = Agent(
+    name="manager_clarification",
+    model=MODEL,
+    instruction="""The user's possible application request is ambiguous. Ask a concise clarifying question about what application they want. Do not create a project specification or begin application-generation work.""",
+)
+
+
 manager_analysis_agent = Agent(
     name="manager_analysis",
     model=MODEL,
@@ -31,7 +53,29 @@ integration_testing_loop = LoopAgent(
     sub_agents=[frontend_agent, integration_agent, testing_agent],
 )
 
-manager_agent = SequentialAgent(
+class IntentGatedManagerAgent(SequentialAgent):
+    async def _run_async_impl(self, ctx):
+        async for event in intent_classifier_agent.run_async(ctx):
+            yield event
+
+        intent = ctx.session.state.get("manager_intent", "")
+        if intent == "CASUAL_CONVERSATION":
+            response_agent = manager_conversation_agent
+        elif intent == "PRODUCTION_REQUEST":
+            response_agent = None
+        else:
+            response_agent = manager_clarification_agent
+
+        if response_agent is not None:
+            async for event in response_agent.run_async(ctx):
+                yield event
+            return
+
+        async for event in super()._run_async_impl(ctx):
+            yield event
+
+
+manager_agent = IntentGatedManagerAgent(
     name="manager_agent",
     description="Define closed client-side scope, generate and validate the frontend, then provide the static runner command only after PASS.",
     sub_agents=[manager_analysis_agent, integration_testing_loop, runner_agent],
